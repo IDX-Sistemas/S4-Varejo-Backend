@@ -1,0 +1,75 @@
+[33mcommit df91bea5afb00c08714a2c89d34e19844c7c9125[m[33m ([m[1;36mHEAD -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Danilo <h2danilo@hotmail.com>
+Date:   Mon Nov 25 15:51:01 2019 -0300
+
+    teste 3
+
+[33mcommit 8248cde3c70907b73673fb07422863c6b8b66bda[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Danilo <h2danilo@hotmail.com>
+Date:   Mon Nov 25 15:48:37 2019 -0300
+
+    adicionado teste2 no arquivo teste.txt
+
+[33mcommit aed707d3e67fdff25412af13ab2794356dbc7592[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 15:45:23 2019 -0300
+
+    update teste.txt
+
+[33mcommit 0543072cc1067d1e45160fbfed15c02ce3c7728a[m
+Merge: 223d576 8d00eb9
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 15:41:08 2019 -0300
+
+    Merge pull request #1 from h2danilo/master
+    
+    criado arquivo teste para testar Fork
+
+[33mcommit 8d00eb938870aad11863824b73b627e9a4a064d4[m
+Author: Danilo <h2danilo@hotmail.com>
+Date:   Mon Nov 25 15:34:23 2019 -0300
+
+    criado arquivo teste para testar Fork
+
+[33mcommit 223d576a8fceba045618e5c92a6bd16da2d5a404[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 15:26:57 2019 -0300
+
+    Update README.md
+
+[33mcommit 4952eca0fb430fbbcce9a4420630f0a9838b2d19[m
+Merge: 6868f41 7b3781f
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 15:25:28 2019 -0300
+
+    Merge branch 'master' of https://github.com/IDX-Sistemas/S4-Varejo-Backend
+
+[33mcommit 6868f415e9c94ba80ecf29c30f24ca1d0f7536c0[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 15:18:24 2019 -0300
+
+    projeto
+
+[33mcommit 7b3781f17b44fec0c9ffe145850ec8c27ad83695[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 14:59:55 2019 -0300
+
+    Update README.md
+
+[33mcommit 5db284f050b5515d759817b9b7a95fc796d86104[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 14:59:20 2019 -0300
+
+    Update README.md
+
+[33mcommit 509e589591664ae6ef2608b70cc52e6d4a3af8cd[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 14:58:58 2019 -0300
+
+    Update README.md
+
+[33mcommit e816688b6e6626ff94bf02922984e9554900fb84[m
+Author: Paulo Penalva <paulo.penalva@gmail.com>
+Date:   Mon Nov 25 14:56:03 2019 -0300
+
+    Initial commit
