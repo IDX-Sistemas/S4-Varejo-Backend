@@ -13,6 +13,7 @@ namespace IdxSistemas.AppServer.OData.Functions
         public static void BuildFunctions(ODataConventionModelBuilder builder)
         {
             FechamentoCaixa(builder);
+            FechamentoCaixaLancado(builder);
         }
 
 
@@ -22,6 +23,14 @@ namespace IdxSistemas.AppServer.OData.Functions
             Function.Parameter<string>("Loja");
             Function.Parameter<DateTime>("Data");
             Function.Returns<string>();
+        }
+
+        private static void FechamentoCaixaLancado(ODataConventionModelBuilder builder)
+        {
+            var Function = builder.Function("FechamentoCaixaLancado");
+            Function.Parameter<string>("Loja");
+            Function.Parameter<DateTime>("Data");
+            Function.Returns<bool>();
         }
     }
 }

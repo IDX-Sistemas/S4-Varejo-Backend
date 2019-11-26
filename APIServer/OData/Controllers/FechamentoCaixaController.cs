@@ -39,5 +39,22 @@ namespace IdxSistemas.AppServer.OData.Controllers
             }
 
         }
+
+        [HttpGet]
+        [ODataRoute("FechamentoCaixaLancado(Loja={loja}, Data={data})")]
+        public IActionResult FechamentoCaixaLancado(string loja, DateTime data)
+        {
+            try
+            {
+                return Ok( this.service.CaixaLancado(loja, data) );
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("Error", ex.Message);
+                return BadRequest(ModelState);
+            }
+
+        }
+
     }
 }

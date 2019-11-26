@@ -139,7 +139,7 @@ namespace IdxSistemas.AppRepository.Services
         }
 
 
-        private bool CaixaLancado(string loja, DateTime data)
+        public bool CaixaLancado(string loja, DateTime data)
         {
             return db.FechamentoCaixa
                 .Where(e => e.Loja == loja && e.Data == data && e.RowDeleted != "T")
