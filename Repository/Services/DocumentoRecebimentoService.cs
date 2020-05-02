@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using IdxSistemas.AppRepository.Context;
 using IdxSistemas.AppRepository.Utils;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -29,16 +30,16 @@ namespace IdxSistemas.AppRepository.Services
             try
             {
             
-                using (SqlConnection conn = new SqlConnection( this.connString ))
+                using (var conn = new MySqlConnection( this.connString ))
                 {
                     var sql = "SELECT MAX(NUM_DOC) AS NUM_DOC FROM pag_doc WHERE sql_deleted <> 'T' AND DAT_PAG = @DAT_PAG AND LOC_PAG = @LOC_PAG";
                     
-                    if(conn.State == System.Data.ConnectionState.Closed)
+                    if(conn.State == ConnectionState.Closed)
                         conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@DAT_PAG", data.ToString("yyyy-MM-dd")));
-                    cmd.Parameters.Add( new SqlParameter("@LOC_PAG", loja));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@DAT_PAG", data.ToString("yyyy-MM-dd")));
+                    cmd.Parameters.Add( new MySqlParameter("@LOC_PAG", loja));
 
                     var rs = cmd.ExecuteReader();
 
@@ -57,9 +58,9 @@ namespace IdxSistemas.AppRepository.Services
                 return numero;
 
             } 
-            catch (SqlException) 
+            catch (SqlException ex)  
             {
-                throw;
+                throw ex;
             }
 
            
@@ -69,23 +70,23 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection( this.connString ))
+                using (var conn = new MySqlConnection( this.connString ))
                 {
                     var sql = "INSERT INTO pag_doc(NUM_DOC, DAT_PAG, LOC_PAG) VALUES(@NUM_DOC, @DAT_PAG, @LOC_PAG)";
-                    if(conn.State == System.Data.ConnectionState.Closed)
+                    if(conn.State == ConnectionState.Closed)
                         conn.Open();
 
-                    var cmd = new SqlCommand(sql, conn); 
-                    cmd.Parameters.Add( new SqlParameter("@NUM_DOC", numero));
-                    cmd.Parameters.Add( new SqlParameter("@DAT_PAG", data));
-                    cmd.Parameters.Add( new SqlParameter("@LOC_PAG", loja)); 
+                    var cmd = new MySqlCommand(sql, conn); 
+                    cmd.Parameters.Add( new MySqlParameter("@NUM_DOC", numero));
+                    cmd.Parameters.Add( new MySqlParameter("@DAT_PAG", data));
+                    cmd.Parameters.Add( new MySqlParameter("@LOC_PAG", loja)); 
 
                     cmd.ExecuteNonQuery();  
                 }
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-                throw;
+                throw ex;
             }
         }
 

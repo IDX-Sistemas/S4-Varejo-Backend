@@ -7,7 +7,8 @@ using Microsoft.Extensions.Configuration;
 
 using IdxSistemas.Models;
 using IdxSistemas.AppRepository.Utils;
-
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -38,32 +39,37 @@ namespace IdxSistemas.AppRepository.Services
 
             try
             {
-                var nf = db.DocumentoEntrada
-                        .Where(e => e.Numero == Numero && e.Fornecedor == Fornecedor && e.RowDeleted != "T").SingleOrDefault();
-
-                if (nf == null)
+                using (var tr = db.Database.BeginTransaction())
                 {
-                    throw new Exception("Documento de Entrada nao encontrado.");
-                }
+                    var nf = db.DocumentoEntrada
+                       .Where(e => e.Numero == Numero && e.Fornecedor == Fornecedor && e.RowDeleted != "T").SingleOrDefault();
 
-                if (nf.Classificacao == "S")
-                {
+                    if (nf == null)
+                    {
+                        throw new Exception("Documento de Entrada nao encontrado.");
+                    }
+
+                    if (nf.Classificacao == "S")
+                    {
+                        return 1;
+                    }
+
+                    CriaContasPagarDocumentoEntrada(Numero, Fornecedor);
+                    ExcluiContaPagarTemp(Numero, Fornecedor);
+                    EntradaItemsEstoque(Numero, Fornecedor);
+
+                    nf.Classificacao = "S";
+
+                    db.SaveChanges();
+                    tr.Commit();
+
                     return 1;
                 }
-
-                CriaContasPagarDocumentoEntrada(Numero, Fornecedor);
-                ExcluiContaPagarTemp(Numero, Fornecedor);
-                EntradaItemsEstoque(Numero, Fornecedor);
-
-                nf.Classificacao = "S";
-
-                db.SaveChanges();
-
-                return 1;
+               
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -72,33 +78,39 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                var nf = db.DocumentoEntrada
+                using (var tr = db.Database.BeginTransaction())
+                {
+                    var nf = db.DocumentoEntrada
                        .Where(e => e.Numero == Numero && e.Fornecedor == Fornecedor && e.RowDeleted != "T").SingleOrDefault();
 
-                if (nf == null)
-                {
-                    throw new Exception("Documento de Entrada nao encontrado.");
+                    if (nf == null)
+                    {
+                        throw new Exception("Documento de Entrada nao encontrado.");
+                    }
+
+
+                    if (ExistePagamento(Numero, Fornecedor))
+                    {
+                        return 4;
+                    }
+
+                    ExcluiTitulos(Numero, Fornecedor);
+                    CriaContaPagarTemp(Numero, Fornecedor);  // NAO MANTEM AJUSTES DE VENCIMENTO VALOR
+                    SaidaItemsEstoque(Numero, Fornecedor);
+
+                    nf.Classificacao = "N";
+                    db.DocumentoEntrada.Update(nf);
+                    db.SaveChanges();
+
+                    tr.Commit();
+
+                    return 1;
                 }
-
-
-                if (ExistePagamento(Numero, Fornecedor))
-                {
-                    return 4;
-                }
-
-                ExcluiTitulos(Numero, Fornecedor);
-                CriaContaPagarTemp(Numero, Fornecedor);  // NAO MANTEM AJUSTES DE VENCIMENTO VALOR
-                SaidaItemsEstoque(Numero, Fornecedor);
-
-                nf.Classificacao = "N";
-                db.DocumentoEntrada.Update(nf);
-                db.SaveChanges();
-
-                return 1;
+                
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -127,9 +139,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -208,9 +220,9 @@ namespace IdxSistemas.AppRepository.Services
                         saldoEstoqueService.EntradaItem(item.Codigo, item.Loja, (int)item.Quantidade);
                     });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -282,15 +294,15 @@ namespace IdxSistemas.AppRepository.Services
 
                     db.SaveChanges();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    throw;
+                    throw ex;
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
 
         }
@@ -305,24 +317,24 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                     {
                         conn.Open();
                     }
 
                     var sql = "DELETE FROM tmp_con_pag WHERE NUM_NOT = @NUM_NOT AND COD_FOR = @COD_FOR";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@NUM_NOT", Numero));
-                    cmd.Parameters.Add(new SqlParameter("@COD_FOR", Fornecedor));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@NUM_NOT", Numero));
+                    cmd.Parameters.Add(new MySqlParameter("@COD_FOR", Fornecedor));
                     cmd.ExecuteNonQuery();
                 }
 
             }
-            catch (SqlException)
+            catch (MySqlException ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -333,9 +345,9 @@ namespace IdxSistemas.AppRepository.Services
             
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = $@"SELECT A.COD_ITE, A.VAL_UNI, A.QUT_ITE, B.DES_ITE
@@ -345,9 +357,9 @@ namespace IdxSistemas.AppRepository.Services
                                 WHERE A.NUM_NOT = @NUM_NOT AND A.COD_FOR = @COD_FOR AND A.sql_deleted <> 'T' ";
                     
                     
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@NUM_NOT", Numero));
-                    cmd.Parameters.Add( new SqlParameter("@COD_FOR", Fornecedor));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@NUM_NOT", Numero));
+                    cmd.Parameters.Add( new MySqlParameter("@COD_FOR", Fornecedor));
 
                     var rs = cmd.ExecuteReader();
                     if (rs.HasRows)
@@ -371,9 +383,9 @@ namespace IdxSistemas.AppRepository.Services
                     
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -383,23 +395,23 @@ namespace IdxSistemas.AppRepository.Services
            
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = $@"DELETE ite_com WHERE NUM_NOT = @NUM_NOT AND COD_FOR = @COD_FOR AND sql_deleted <> 'T' ";
                     
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@NUM_NOT", Numero));
-                    cmd.Parameters.Add( new SqlParameter("@COD_FOR", Fornecedor));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@NUM_NOT", Numero));
+                    cmd.Parameters.Add( new MySqlParameter("@COD_FOR", Fornecedor));
 
                     return cmd.ExecuteNonQuery();
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

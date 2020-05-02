@@ -9,6 +9,8 @@ using IdxSistemas.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using IdxSistemas.Models.Tipos.ContaReceber;
+using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -38,17 +40,17 @@ namespace IdxSistemas.AppRepository.Services
 
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"SELECT NUM_DUP
                                   FROM con_rec WHERE COD_CLI = @COD_CLI AND FLA_PAG <> '1' AND  sql_deleted <> 'T' 
                               ORDER BY DAT_VEN, NUM_DUP";
                     
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@COD_CLI", codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@COD_CLI", codigo));
 
                     var rs = cmd.ExecuteReader();
 
@@ -66,9 +68,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -91,10 +93,10 @@ namespace IdxSistemas.AppRepository.Services
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
 
@@ -173,9 +175,9 @@ namespace IdxSistemas.AppRepository.Services
     
                 return receber;
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -223,9 +225,9 @@ namespace IdxSistemas.AppRepository.Services
 
                     return db.SaveChanges();
                 }
-                catch (DbUpdateException)
+                catch (DbUpdateException ex)
                 {
-                    throw;
+                    throw ex;
                 }
 
         }
@@ -277,9 +279,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 return db.SaveChanges();
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -289,15 +291,16 @@ namespace IdxSistemas.AppRepository.Services
             {
                 DateTime? data = null;
 
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"SELECT MAX(DAT_PAG) DATA
                                   FROM fil_rec WHERE NUM_DUP = @NUM_DUP AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@NUM_DUP", Numero));
+                    
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@NUM_DUP", Numero));
 
                     var rs = cmd.ExecuteReader();
 
@@ -310,9 +313,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -322,15 +325,15 @@ namespace IdxSistemas.AppRepository.Services
             {
                 double total = 0;
 
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"SELECT SUM(VAL_PAG) AS TOTAL
                                   FROM fil_rec WHERE NUM_DUP = @NUM_DUP AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@NUM_DUP", Numero));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@NUM_DUP", Numero));
 
                     var rs = cmd.ExecuteReader();
 
@@ -343,9 +346,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
     }

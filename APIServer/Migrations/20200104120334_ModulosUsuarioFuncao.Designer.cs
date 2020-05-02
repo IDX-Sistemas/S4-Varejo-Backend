@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IdxSistemas.AppServer.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20191125124116_table_arq_cai")]
-    partial class table_arq_cai
+    [Migration("20200104120334_ModulosUsuarioFuncao")]
+    partial class ModulosUsuarioFuncao
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -58,6 +58,27 @@ namespace IdxSistemas.AppServer.Migrations
                     b.HasKey("RowId");
 
                     b.ToTable("age_loj");
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.Aplicativo", b =>
+                {
+                    b.Property<string>("Codigo")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200);
+
+                    b.Property<string>("Descricao");
+
+                    b.Property<string>("Icone");
+
+                    b.Property<string>("TargetURL")
+                        .IsRequired();
+
+                    b.Property<string>("Titulo")
+                        .IsRequired();
+
+                    b.HasKey("Codigo");
+
+                    b.ToTable("Aplicativos");
                 });
 
             modelBuilder.Entity("IdxSistemas.Models.Cancelada", b =>
@@ -1053,7 +1074,7 @@ namespace IdxSistemas.AppServer.Migrations
                         .HasColumnName("sql_rowid")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime?>("Data")
+                    b.Property<DateTime>("Data")
                         .HasColumnName("DAT");
 
                     b.Property<string>("Loja")
@@ -1090,6 +1111,8 @@ namespace IdxSistemas.AppServer.Migrations
                         .HasColumnName("VIS");
 
                     b.HasKey("RowId");
+
+                    b.HasIndex("Data");
 
                     b.ToTable("arq_cai");
                 });
@@ -1405,6 +1428,56 @@ namespace IdxSistemas.AppServer.Migrations
                     b.HasKey("RowId");
 
                     b.ToTable("cad_mar");
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.Modulo", b =>
+                {
+                    b.Property<string>("Codigo")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Descricao")
+                        .IsRequired();
+
+                    b.Property<string>("Nome")
+                        .IsRequired();
+
+                    b.Property<string>("UsuarioFuncaoId")
+                        .IsRequired()
+                        .HasMaxLength(15);
+
+                    b.HasKey("Codigo");
+
+                    b.HasIndex("UsuarioFuncaoId");
+
+                    b.ToTable("Modulos");
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.ModuloAplicativo", b =>
+                {
+                    b.Property<long>("RowId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("sql_rowid")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AplicativoCodigo")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.Property<string>("ModuloCodigo")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("RowDeleted")
+                        .HasColumnName("sql_deleted");
+
+                    b.HasKey("RowId");
+
+                    b.HasIndex("AplicativoCodigo");
+
+                    b.HasIndex("ModuloCodigo");
+
+                    b.ToTable("ModuloAplicativos");
                 });
 
             modelBuilder.Entity("IdxSistemas.Models.MovimentoCaixa", b =>
@@ -2122,9 +2195,29 @@ namespace IdxSistemas.AppServer.Migrations
                         .HasColumnName("SEN_USR")
                         .HasMaxLength(10);
 
+                    b.Property<string>("UsuarioFuncaoId")
+                        .HasColumnName("FUNCAO_ID")
+                        .HasMaxLength(15);
+
                     b.HasKey("RowId");
 
+                    b.HasIndex("UsuarioFuncaoId");
+
                     b.ToTable("cad_ace");
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.UsuarioFuncao", b =>
+                {
+                    b.Property<string>("FuncaoId")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(15);
+
+                    b.Property<string>("Descricao")
+                        .IsRequired();
+
+                    b.HasKey("FuncaoId");
+
+                    b.ToTable("UsuarioFuncao");
                 });
 
             modelBuilder.Entity("IdxSistemas.Models.VendaSecao", b =>
@@ -2333,6 +2426,27 @@ namespace IdxSistemas.AppServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("IdxSistemas.Models.Modulo", b =>
+                {
+                    b.HasOne("IdxSistemas.Models.UsuarioFuncao", "UsuarioFuncao")
+                        .WithMany()
+                        .HasForeignKey("UsuarioFuncaoId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.ModuloAplicativo", b =>
+                {
+                    b.HasOne("IdxSistemas.Models.Aplicativo", "Aplicativo")
+                        .WithMany()
+                        .HasForeignKey("AplicativoCodigo")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("IdxSistemas.Models.Modulo", "Modulo")
+                        .WithMany()
+                        .HasForeignKey("ModuloCodigo")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("IdxSistemas.Models.MovimentoCaixa", b =>
                 {
                     b.HasOne("IdxSistemas.Models.Loja", "Lojas")
@@ -2406,6 +2520,13 @@ namespace IdxSistemas.AppServer.Migrations
                         .WithMany()
                         .HasForeignKey("Loja")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("IdxSistemas.Models.Usuario", b =>
+                {
+                    b.HasOne("IdxSistemas.Models.UsuarioFuncao", "UsuarioFuncao")
+                        .WithMany()
+                        .HasForeignKey("UsuarioFuncaoId");
                 });
 #pragma warning restore 612, 618
         }

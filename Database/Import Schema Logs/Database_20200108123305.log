@@ -1,0 +1,84 @@
+07/01/2020 21:33:05	This log contains information about the import schema operation into project 'Database' on computer 'IDX-PC003' by user 'IDX'.
+07/01/2020 21:33:05	Import of database schema has started.
+07/01/2020 21:33:11	Gathering database credentials
+07/01/2020 21:33:11	Gathering database options
+07/01/2020 21:33:11	Gathering users
+07/01/2020 21:33:11	Gathering roles
+07/01/2020 21:33:11	Gathering application roles
+07/01/2020 21:33:11	Gathering role memberships
+07/01/2020 21:33:11	Gathering filegroups
+07/01/2020 21:33:11	Gathering full-text catalogs
+07/01/2020 21:33:11	Gathering assemblies
+07/01/2020 21:33:11	Gathering certificates
+07/01/2020 21:33:11	Gathering asymmetric keys
+07/01/2020 21:33:11	Gathering symmetric keys
+07/01/2020 21:33:11	Gathering encrypted symmetric keys
+07/01/2020 21:33:11	Gathering schemas
+07/01/2020 21:33:11	Gathering XML schema collections
+07/01/2020 21:33:11	Gathering user-defined data types
+07/01/2020 21:33:11	Gathering user-defined types
+07/01/2020 21:33:11	Gathering table types
+07/01/2020 21:33:11	Gathering unique keys for table types
+07/01/2020 21:33:11	Gathering primary keys for table types
+07/01/2020 21:33:11	Gathering indexes for table types
+07/01/2020 21:33:11	Gathering check constraints for table types
+07/01/2020 21:33:11	Gathering default constraints for table types
+07/01/2020 21:33:11	Gathering partition functions
+07/01/2020 21:33:11	Gathering partition schemes
+07/01/2020 21:33:11	Gathering functions
+07/01/2020 21:33:11	Gathering encrypted functions
+07/01/2020 21:33:12	Gathering aggregates
+07/01/2020 21:33:12	Gathering procedures
+07/01/2020 21:33:12	Gathering encrypted procedures
+07/01/2020 21:33:12	Gathering tables
+07/01/2020 21:33:12	Gathering primary keys
+07/01/2020 21:33:12	Gathering unique constraints
+07/01/2020 21:33:12	Gathering foreign keys
+07/01/2020 21:33:12	Gathering default constraints
+07/01/2020 21:33:13	Gathering check constraints
+07/01/2020 21:33:13	Gathering views
+07/01/2020 21:33:13	Gathering encrypted views
+07/01/2020 21:33:13	Gathering indexes
+07/01/2020 21:33:13	Gathering statistics
+07/01/2020 21:33:13	Gathering full-text index stoplists
+07/01/2020 21:33:13	Gathering search property lists
+07/01/2020 21:33:13	Gathering search properties
+07/01/2020 21:33:13	Gathering full-text indexes
+07/01/2020 21:33:13	Gathering column store indexes
+07/01/2020 21:33:13	Gathering spatial indexes
+07/01/2020 21:33:13	Gathering XML indexes
+07/01/2020 21:33:13	Gathering Selective XML indexes
+07/01/2020 21:33:13	Gathering encrypted triggers
+07/01/2020 21:33:13	Gathering triggers
+07/01/2020 21:33:13	Gathering encrypted and clr ddl triggers
+07/01/2020 21:33:13	Gathering ddl triggers
+07/01/2020 21:33:13	Gathering synonyms
+07/01/2020 21:33:13	Gathering defaults
+07/01/2020 21:33:13	Gathering data constraint uddt bindings
+07/01/2020 21:33:13	Gathering rules
+07/01/2020 21:33:13	Gathering data constraint uddt bindings
+07/01/2020 21:33:13	Gathering message types
+07/01/2020 21:33:13	Gathering queues
+07/01/2020 21:33:13	Gathering contracts
+07/01/2020 21:33:13	Gathering services
+07/01/2020 21:33:13	Gathering event notifications
+07/01/2020 21:33:13	Gathering remote service bindings
+07/01/2020 21:33:13	Gathering broker priorities
+07/01/2020 21:33:13	Gathering signatures
+07/01/2020 21:33:13	Gathering data compression options
+07/01/2020 21:33:13	Gathering sequence types
+07/01/2020 21:33:13	Gathering security policies
+07/01/2020 21:33:13	Gather column encryption keys
+07/01/2020 21:33:13	Gathering column master keys
+07/01/2020 21:33:13	Gathering external data sources
+07/01/2020 21:33:13	Gathering external file formats
+07/01/2020 21:33:13	Gathering external tables
+07/01/2020 21:33:13	Gathering extended properties
+07/01/2020 21:33:13	Gathering credentials
+07/01/2020 21:33:13	Gathering logins
+07/01/2020 21:33:13	Gathering server audits
+07/01/2020 21:33:14	Scanning project for duplicate elements
+07/01/2020 21:33:14	Finished duplicate element processing
+07/01/2020 21:33:19	Finished importing database.
+07/01/2020 21:33:19	A summary of the import was saved to the following location: C:\Projetos\IDX_S4\Forever\apiserver\src\Database\Import Schema Logs\Database_20200108123305.log
+07/01/2020 21:33:19	Click Finish to continue...

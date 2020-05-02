@@ -53,10 +53,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                throw ex;
             }
         }
 
@@ -84,10 +83,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                throw ex;
             }
         }
 

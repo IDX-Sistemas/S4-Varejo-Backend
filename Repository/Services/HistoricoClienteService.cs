@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using IdxSistemas.AppRepository.Context;
 using IdxSistemas.AppRepository.Utils;
 using IdxSistemas.Models;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -59,9 +61,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 return db.SaveChanges();
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -70,22 +72,22 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"DELETE FROM TMP_HISTORICO_CLIENTE WHERE Cliente = @Cliente";
 
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@Cliente", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@Cliente", Codigo));
 
                     cmd.ExecuteNonQuery();
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -96,9 +98,9 @@ namespace IdxSistemas.AppRepository.Services
             {
                 double valorPago = 0;
 
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"SELECT SUM(VAL_PAG) VAL_PAG
@@ -106,9 +108,9 @@ namespace IdxSistemas.AppRepository.Services
                                   WHERE NUM_DUP = @NUM_DUP AND COD_LOC = @COD_LOC AND  
                                         sql_deleted <> 'T'";
 
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@NUM_DUP", NumeroDuplicata));
-                    cmd.Parameters.Add(new SqlParameter("@COD_LOC", Loja));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@NUM_DUP", NumeroDuplicata));
+                    cmd.Parameters.Add(new MySqlParameter("@COD_LOC", Loja));
 
                     var rs = cmd.ExecuteReader();
 
@@ -123,9 +125,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -136,9 +138,9 @@ namespace IdxSistemas.AppRepository.Services
             {
                 DateTime? dataPagamento = null;
 
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = @"SELECT MAX(DAT_PAG) DAT_PAG
@@ -146,9 +148,9 @@ namespace IdxSistemas.AppRepository.Services
                                   WHERE NUM_DUP = @NUM_DUP AND COD_LOC = @COD_LOC AND  
                                         sql_deleted <> 'T'";
 
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@NUM_DUP", NumeroDuplicata));
-                    cmd.Parameters.Add(new SqlParameter("@COD_LOC", Loja));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@NUM_DUP", NumeroDuplicata));
+                    cmd.Parameters.Add(new MySqlParameter("@COD_LOC", Loja));
 
                     var rs = cmd.ExecuteReader();
 
@@ -164,9 +166,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
     }

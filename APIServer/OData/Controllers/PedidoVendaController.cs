@@ -43,12 +43,17 @@ namespace IdxSistemas.AppServer.OData.Controllers
 
             try
             {
-                db.PedidoVenda.Add(t);
-                db.SaveChanges();
+                using (var tr = db.Database.BeginTransaction())
+                {
+                    db.PedidoVenda.Add(t);
+                    db.SaveChanges();
 
-                pedidoVendaService.CriaContaReceberTemp(t.Numero, t.Loja);
+                    pedidoVendaService.CriaContaReceberTemp(t.Numero, t.Loja);
+
+                    tr.Commit();
+                }
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             { 
                 var items = db.PedidoVendaItem
                    .Where(e => e.NumeroVenda == t.Numero && e.Loja == t.Loja && t.RowDeleted != "T");
@@ -66,7 +71,8 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 }
                 else
                 {
-                    throw;
+                    ModelState.AddModelError(ex.Message, ex.StackTrace);
+                    return BadRequest(ModelState);
                 }
             }
 
@@ -93,11 +99,17 @@ namespace IdxSistemas.AppServer.OData.Controllers
 
             try
             {
-                db.SaveChanges();
+                using (var tr = db.Database.BeginTransaction())
+                {
+                    db.SaveChanges();
 
-                pedidoVendaService.CriaContaReceberTemp(t.Numero, t.Loja);
+                    pedidoVendaService.CriaContaReceberTemp(t.Numero, t.Loja);
+
+                    tr.Commit();
+                }
+                
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!EntityExists(key))
                 {
@@ -105,7 +117,8 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 }
                 else
                 {
-                    throw;
+                    ModelState.AddModelError(ex.Message, ex.StackTrace);
+                    return BadRequest(ModelState);
                 }
             }
 
@@ -134,9 +147,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 db.PedidoVenda.Remove(t);
                 db.SaveChanges();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
            
             return NoContent();
@@ -150,16 +164,17 @@ namespace IdxSistemas.AppServer.OData.Controllers
 
         [HttpGet]
         [ODataRoute("ExistePedidoVenda(Numero={numero}, Loja={loja})")]
-        public IActionResult GetClientePeloCodigo(string numero, string loja)
+        public IActionResult ExistePedidoVenda(string numero, string loja)
         {
             var service = new PedidoVendaService(this.db, this.configuration);
             try
             {
                 return Ok( service.existePedido(numero, loja) );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
         }
 
@@ -173,9 +188,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.existeRecebimento(numero, loja));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
         }
 
@@ -189,9 +205,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.FaturaPedido(numero, loja));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -205,9 +222,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.EstornaFaturamentoPedido(numero, loja));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
         }
 
@@ -221,9 +239,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.CancelaPedido(numero, loja));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
         }
 
@@ -237,9 +256,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.GetDadosCarne(numero, loja));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(ex.Message, ex.StackTrace);
+                return BadRequest(ModelState);
             }
         }
     }

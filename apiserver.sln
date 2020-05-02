@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIServer", "APIServer\APIServer.csproj", "{AB854ADA-BAC3-4BB8-B16A-CBB263BAF2F6}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,24 @@ Global
 		{AB854ADA-BAC3-4BB8-B16A-CBB263BAF2F6}.Release|x64.Build.0 = Release|Any CPU
 		{AB854ADA-BAC3-4BB8-B16A-CBB263BAF2F6}.Release|x86.ActiveCfg = Release|Any CPU
 		{AB854ADA-BAC3-4BB8-B16A-CBB263BAF2F6}.Release|x86.Build.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x64.Build.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x86.Build.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x64.ActiveCfg = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x64.Build.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x64.Deploy.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x86.ActiveCfg = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x86.Build.0 = Release|Any CPU
+		{240BF4B4-69C7-4FD8-849C-8B1DE2CBFCD3}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

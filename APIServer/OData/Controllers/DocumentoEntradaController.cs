@@ -8,6 +8,7 @@ using Microsoft.AspNet.OData.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppServer.OData.Controllers
 {
@@ -45,8 +46,14 @@ namespace IdxSistemas.AppServer.OData.Controllers
 
             try
             {
-                db.SaveChanges();
-                service.CriaContaPagarTemp(t.Numero, t.Fornecedor);
+                using (var tr = db.Database.BeginTransaction() )
+                {
+                    db.SaveChanges();
+                    service.CriaContaPagarTemp(t.Numero, t.Fornecedor);
+
+                    tr.Commit();
+                }
+               
             }
             catch (Exception ex)
             {
@@ -85,8 +92,12 @@ namespace IdxSistemas.AppServer.OData.Controllers
            
             try
             {
-                db.SaveChanges();
-                service.CriaContaPagarTemp(t.Numero, t.Fornecedor);
+                using (var tr = db.Database.BeginTransaction())
+                {
+                    db.SaveChanges();
+                    service.CriaContaPagarTemp(t.Numero, t.Fornecedor);
+                    tr.Commit();
+                }
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -115,6 +126,9 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 {
                     db.DocumentoEntradaItem.Remove(item);
                 }
+
+                //deletar conta pagar temp
+                // deletar conta pagar se estiver em aberto
 
                 db.DocumentoEntrada.Remove(t);
                 db.SaveChanges();

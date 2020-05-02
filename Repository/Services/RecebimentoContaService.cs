@@ -59,10 +59,10 @@ namespace IdxSistemas.AppRepository.Services
                 return comprovante;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
 
         }

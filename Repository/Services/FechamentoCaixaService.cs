@@ -18,7 +18,7 @@ namespace IdxSistemas.AppRepository.Services
             this.db = db;
         }
 
-        public void GeraFechamentoCaixa(string loja, DateTime data)
+        public FechamentoCaixa GeraFechamentoCaixa(string loja, DateTime data)
         {
             double? valorVista = 0;
             double? valorEntrada = 0;
@@ -74,10 +74,18 @@ namespace IdxSistemas.AppRepository.Services
                 .ToList()
                 .ForEach(e => {
 
-                    if (e.ContaReceber.TipoVenda == "2" || e.ContaReceber.TipoVenda == "3")
+
+                    var cr = db.ContaReceber
+                        .Where(c => c.NumeroDuplicata == e.NumeroDuplicata && c.Loja == e.Loja && c.RowDeleted != "T")
+                        .SingleOrDefault();
+
+                    if (cr != null)
                     {
-                        if (e.ContaReceber.FlagEntrada != "S")
-                            valorCrediario += e.ValorPago;
+                        if (cr.TipoVenda == "2" || cr.TipoVenda == "3")
+                        {
+                            if (cr.FlagEntrada != "S")
+                                valorCrediario += e.ValorPago;
+                        }
                     }
                     
                     valorJuros += e.ValorJuros;
@@ -136,6 +144,8 @@ namespace IdxSistemas.AppRepository.Services
             }
 
             db.SaveChanges();
+
+            return fechamento;
         }
 
 

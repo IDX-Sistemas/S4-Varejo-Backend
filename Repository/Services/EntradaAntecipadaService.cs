@@ -90,9 +90,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 return 1;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
 
         }
@@ -120,9 +120,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 saldoEstoqueService.SaidaItem(entrada.Produto, entrada.Loja, (int)entrada.Quantidade);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             
         }

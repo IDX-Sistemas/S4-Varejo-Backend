@@ -59,7 +59,11 @@ namespace IdxSistemas.AppServer.OData.Edm
             builder.EntitySet<Relatorios>("Relatorios");
             builder.EntitySet<Pergunta>("Perguntas");
             builder.EntitySet<FechamentoCaixa>("FechamentoCaixa");
-            
+            builder.EntitySet<Modulo>("Modulos");
+            builder.EntitySet<ModuloAplicativo>("ModuloAplicativos");
+            builder.EntitySet<Aplicativo>("Aplicativos");
+            builder.EntitySet<UsuarioFuncao>("UsuarioFuncoes");
+
             #endregion
 
             EdmFunctions.BuildFunctions(builder);

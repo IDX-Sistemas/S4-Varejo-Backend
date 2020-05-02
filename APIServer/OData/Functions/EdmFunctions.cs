@@ -23,6 +23,7 @@ namespace IdxSistemas.AppServer.OData.Functions
             RelatoriosFunctions.BuildFunctions(builder);
             SecaoFunctions.BuildFunctions(builder);
             FechamentoCaixaFunctions.BuildFunctions(builder);
+            AplicativosFunctions.BuildFunctions(builder);
 
 
             var FunctionExisteCodigoVendedor = builder.Function("ExisteCodigoVendedor");

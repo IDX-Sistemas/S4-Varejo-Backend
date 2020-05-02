@@ -1,9 +1,11 @@
 using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using IdxSistemas.AppRepository.Context;
 using IdxSistemas.Models;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -31,10 +33,10 @@ namespace IdxSistemas.AppRepository.Services
                 Produto produto = db.Produtos.Where( e => e.Codigo == codigo && e.RowDeleted != "T").SingleOrDefault();
                 return produto;
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
                 
-                throw;
+                throw ex;
             }
 
         }
@@ -42,45 +44,53 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = "SELECT sql_rowid FROM cad_ite WHERE COD_ITE = @COD_ITE AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@COD_ITE", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@COD_ITE", Codigo));
 
                     var rs = cmd.ExecuteReader();
 
                     return rs.HasRows ;   
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
-        public string getDescricao(string Codigo)
+        public string getDescricao(string codigo)
+        {
+            return db.Produtos
+                .Where(e => e.Codigo.Replace(" ", "") == codigo.Substring(0, 12) && e.RowDeleted != "T")
+                .Select(e => e.Descricao)
+                .SingleOrDefault();
+        }
+
+        public string getDescricao2(string Codigo)
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = "SELECT DES_ITE FROM cad_ite WHERE COD_ITE = @COD_ITE AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@COD_ITE", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@COD_ITE", Codigo) );
 
                     return cmd.ExecuteScalar().ToString();
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -101,9 +111,9 @@ namespace IdxSistemas.AppRepository.Services
                     return cmd.ExecuteScalar().ToString();
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -112,23 +122,23 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = "SELECT sql_rowid FROM cad_mar WHERE COD_MAR = @COD_MAR AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@COD_MAR", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@COD_MAR", Codigo));
 
                     var rs = cmd.ExecuteReader();
 
                     return rs.HasRows;
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -136,23 +146,23 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = "SELECT sql_rowid FROM cad_ord WHERE COD_ORD = @COD_ORD AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@COD_ORD", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@COD_ORD", Codigo));
 
                     var rs = cmd.ExecuteReader();
 
                     return rs.HasRows;
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

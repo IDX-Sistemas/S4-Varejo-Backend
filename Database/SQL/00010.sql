@@ -1,0 +1,21 @@
+﻿CREATE TABLE tmp_con_pag(
+	sql_rowid bigint auto_increment primary key,
+	sql_deleted enum('F','T') default 'T',
+	NUM_DOC varchar(6),
+	COD_LOC varchar(2),
+	NUM_CHE varchar(6),
+	COD_FOR varchar(4),
+	NUM_NOT varchar(8),
+	DAT_EMI date,
+	CLA_FIS varchar(1),
+	NUM_DUP varchar(8),
+	VAL_DUP double,
+	HIS_DUP varchar(30),
+	VAL_JUR double,
+	VAL_DES double,
+	VAL_PAG double,
+	DAT_VEN date,
+	DAT_REC date,
+	DAT_PAG date,
+	COD_CON varchar(3)
+)

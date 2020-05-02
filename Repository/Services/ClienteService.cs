@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using IdxSistemas.AppRepository.Context;
 using IdxSistemas.Models;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -29,10 +31,10 @@ namespace IdxSistemas.AppRepository.Services
             {
                 return db.Clientes.Where( e => e.Codigo ==Codigo && e.RowDeleted != "T").SingleOrDefault();
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
                 
-                throw;
+                throw ex;
             }
         }
         
@@ -43,21 +45,21 @@ namespace IdxSistemas.AppRepository.Services
 
             try{
             
-                using (SqlConnection conn = new SqlConnection( this.connString ))
+                using (var conn = new MySqlConnection( this.connString ))
                 {
                     var sql = "SELECT COD_CLI FROM cli_cod";
                     
                     if(conn.State == System.Data.ConnectionState.Closed)
                         conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(sql, conn);    
+                    var cmd = new MySqlCommand(sql, conn);    
                     var codigo = cmd.ExecuteScalar();
                     proximoCodigo = (Convert.ToInt32(codigo) + 1).ToString().PadLeft(5,'0');
                 }       
             
-            } catch (Exception) {
+            } catch (Exception ex) {
             
-                throw;
+                throw ex;
             
             }
             
@@ -68,22 +70,22 @@ namespace IdxSistemas.AppRepository.Services
         {
              try{
             
-                using (SqlConnection conn = new SqlConnection( this.connString ))
+                using (var conn = new MySqlConnection( this.connString ))
                 {
                     var sql = "UPDATE cli_cod SET COD_CLI = @COD_CLI";
                     
-                    if(conn.State == System.Data.ConnectionState.Closed)
+                    if(conn.State == ConnectionState.Closed)
                         conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(sql, conn); 
-                    cmd.Parameters.Add(new SqlParameter("@COD_CLI",codigo));
+                    var cmd = new MySqlCommand(sql, conn); 
+                    cmd.Parameters.Add(new MySqlParameter("@COD_CLI",codigo));
 
                     cmd.ExecuteNonQuery();
                 }       
             
-            } catch (Exception) {
+            } catch (Exception ex) {
             
-                throw;
+                throw ex;
             
             }
         }

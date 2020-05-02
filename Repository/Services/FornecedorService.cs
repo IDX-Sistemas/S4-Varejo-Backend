@@ -2,6 +2,7 @@ using System;
 using System.Data.SqlClient;
 using IdxSistemas.AppRepository.Context;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -28,21 +29,21 @@ namespace IdxSistemas.AppRepository.Services
 
             try{
             
-                using (SqlConnection conn = new SqlConnection( this.connString ))
+                using (MySqlConnection conn = new MySqlConnection( this.connString ))
                 {
                     var sql = "SELECT MAX(COD_FOR) FROM cad_for WHERE COD_FOR <> '9999'";
                     
                     if(conn.State == System.Data.ConnectionState.Closed)
                         conn.Open();
 
-                    SqlCommand cmd = new SqlCommand(sql, conn);    
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);    
                     var codigo = cmd.ExecuteScalar();
                     proximoCodigo = (Convert.ToInt32(codigo) + 1).ToString().PadLeft(4,'0');
                 }       
             
-            } catch (Exception) {
+            } catch (Exception ex) {
             
-                throw;
+                throw ex;
             
             }
             

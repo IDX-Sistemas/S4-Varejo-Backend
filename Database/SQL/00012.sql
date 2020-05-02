@@ -1,0 +1,5 @@
+﻿ALTER TABLE ite_not ADD COLUMN VAL_DES double;
+ALTER TABLE ite_not ADD COLUMN VAL_ACR double;
+ALTER TABLE ite_not ADD COLUMN COD_VEN varchar(2);
+ALTER TABLE ite_not ADD COLUMN COD_SEC varchar(2);
+ALTER TABLE ite_not ADD COLUMN NUM_CTL varchar(6);

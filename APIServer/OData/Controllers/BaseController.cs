@@ -21,14 +21,23 @@ namespace IdxSistemas.AppServer.OData.Controllers
         [HttpGet, EnableQuery]
         public IQueryable<T> Get()
         {
-            return db.Set<T>().Where( e => e.RowDeleted != "T");
+            return db.Set<T>().Where( e => e.RowDeleted != "T" );
         }
 
         [HttpGet, EnableQuery]
         public SingleResult<T> Get([FromODataUri] long key)
         {
-            return SingleResult.Create(
-                db.Set<T>().Where(x => x.RowId == key && x.RowDeleted != "T"));
+            try
+            {
+                return SingleResult.Create(
+                    db.Set<T>().Where(x => x.RowId == key && x.RowDeleted != "T"));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return null;
+            }
+           
         }
 
         [HttpPut]
@@ -60,7 +69,7 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(ex.GetType().ToString(), ex.Message);
+                    ModelState.AddModelError(string.Empty, ex.Message);
                     return BadRequest(ModelState);
                 }
             }

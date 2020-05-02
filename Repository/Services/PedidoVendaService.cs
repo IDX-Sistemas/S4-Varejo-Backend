@@ -9,6 +9,8 @@ using System.Data.SqlClient;
 using IdxSistemas.DTO;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -26,7 +28,6 @@ namespace IdxSistemas.AppRepository.Services
             this.configuration = configuration;
             this.connectionString = configuration.GetConnectionString("sage_db");
         }
-
 
         public CarneDTO GetDadosCarne(string Numero, string Loja)
         {
@@ -78,10 +79,10 @@ namespace IdxSistemas.AppRepository.Services
 
                 return carne;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
 
         }
@@ -94,35 +95,40 @@ namespace IdxSistemas.AppRepository.Services
         }
 
 
-        public int FaturaPedido(string Numero, String Loja)
+        public int FaturaPedido(string Numero, string Loja)
         {
 
             try
             {
-                var pedido = db.PedidoVenda.Where(e => e.Numero == Numero && e.Loja == Loja && e.RowDeleted != "T").SingleOrDefault();
-                if (pedido == null)
+                using (var tr = db.Database.BeginTransaction())
                 {
-                    return Status.NAO_ENCONTRADO;
-                }
+                    var pedido = db.PedidoVenda.Where(e => e.Numero == Numero && e.Loja == Loja && e.RowDeleted != "T").SingleOrDefault();
+                    if (pedido == null)
+                    {
+                        return Status.NAO_ENCONTRADO;
+                    }
 
-                if (pedido.Faturado == Faturado.SIM)
-                {
-                    return Status.PEDIDO_FATURADO;
+                    if (pedido.Faturado == Faturado.SIM)
+                    {
+                        return Status.PEDIDO_FATURADO;
+                    }
+
+                    CriaContaReceberPeloPedido(Numero, Loja);
+                    ExcluiContaReceberTemp(Numero, Loja);
+                    SaidaItemsEstoque(Numero, Loja);
+
+                    pedido.Faturado = Faturado.SIM;
+
+                    db.SaveChanges();
+                    tr.Commit();
+
+                    return Status.OK;
                 }
                 
-                CriaContaReceberPeloPedido(Numero, Loja);
-                ExcluiContaReceberTemp(Numero, Loja);
-                SaidaItemsEstoque(Numero, Loja);
-               
-                pedido.Faturado = Faturado.SIM;
-
-                db.SaveChanges();
-
-                return Status.OK;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -131,30 +137,36 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                var pedido = db.PedidoVenda.Where(e => e.Numero == Numero && e.Loja == Loja && e.RowDeleted != "T").SingleOrDefault();
-                if (pedido == null)
+                using (var tr = db.Database.BeginTransaction() )
                 {
-                    return Status.NAO_ENCONTRADO;
+                    var pedido = db.PedidoVenda.Where(e => e.Numero == Numero && e.Loja == Loja && e.RowDeleted != "T").SingleOrDefault();
+                    if (pedido == null)
+                    {
+                        return Status.NAO_ENCONTRADO;
+                    }
+
+                    if (existeRecebimento(Numero, Loja))
+                    {
+                        return Status.PEDIDO_RECEBIDO;
+                    }
+
+                    excluiTitulos(Numero, Loja);
+                    CriaContaReceberTemp(Numero, Loja);  // NAO MANTEM AJUSTES DE VENCIMENTO VALOR
+                    EntradaItemsEstoque(Numero, Loja);
+
+                    pedido.Faturado = Faturado.NAO;
+                    db.PedidoVenda.Update(pedido);
+                    db.SaveChanges();
+                    
+                    tr.Commit();
+
+                    return Status.OK;
                 }
-
-                if ( existeRecebimento(Numero, Loja) )
-                {
-                    return Status.PEDIDO_RECEBIDO;
-                }
-
-                excluiTitulos(Numero, Loja);
-                CriaContaReceberTemp(Numero, Loja);  // NAO MANTEM AJUSTES DE VENCIMENTO VALOR
-                EntradaItemsEstoque(Numero, Loja);
-
-                pedido.Faturado = Faturado.NAO;
-                db.PedidoVenda.Update(pedido);
-                db.SaveChanges();
-
-                return Status.OK;
+                
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         } 
 
@@ -171,10 +183,12 @@ namespace IdxSistemas.AppRepository.Services
                     .ForEach(item => {
                         saldoEstoqueService.SaidaItem(item.Codigo, item.Loja, (int)item.Quantidade);
                     });
+
+                
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -185,16 +199,21 @@ namespace IdxSistemas.AppRepository.Services
 
             try
             {
-                db.PedidoVendaItem
-                    .Where(e => e.NumeroVenda == Numero && e.Loja == Loja && e.RowDeleted != "T")
-                    .ToList()
-                    .ForEach(item => {
-                        saldoEstoqueService.EntradaItem(item.Codigo, item.Loja, (int)item.Quantidade);
-                    });
+                using (var tr = db.Database.BeginTransaction() )
+                {
+                    db.PedidoVendaItem
+                        .Where(e => e.NumeroVenda == Numero && e.Loja == Loja && e.RowDeleted != "T")
+                        .ToList()
+                        .ForEach(item => {
+                            saldoEstoqueService.EntradaItem(item.Codigo, item.Loja, (int)item.Quantidade);
+                        });
+                    tr.Commit();
+                }
+                
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -221,10 +240,10 @@ namespace IdxSistemas.AppRepository.Services
 
                 return Status.OK;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }   
         }
         public void CriaContaReceberTemp(string Numero, String Loja)
@@ -309,37 +328,36 @@ namespace IdxSistemas.AppRepository.Services
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
 
 
-        private void ExcluiContaReceberTemp(string Numero, String Loja)
+        private void ExcluiContaReceberTemp(string Numero, string Loja)
         {
             try
             {
-                using(var conn = new SqlConnection(connectionString))
+                using(var conn = new MySqlConnection(connectionString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                     {
                         conn.Open();
                     }
 
                     var sql = "DELETE FROM tmp_con_rec WHERE NUM__CI = @NUM__CI AND LOC_PAG = @LOC_PAG";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@NUM__CI", Numero));
-                    cmd.Parameters.Add(new SqlParameter("@LOC_PAG", Loja));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add(new MySqlParameter("@NUM__CI", Numero));
+                    cmd.Parameters.Add(new MySqlParameter("@LOC_PAG", Loja));
                     cmd.ExecuteNonQuery();
                 }
 
             }
-            catch (SqlException)
+            catch (SqlException ex)
             {
-
-                throw;
+                throw ex;
             }
         }
 
@@ -379,9 +397,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -470,10 +488,9 @@ namespace IdxSistemas.AppRepository.Services
                 }
                 
             }
-            catch (Exception)
+            catch (Exception ex )
             {
-
-                throw;
+                throw ex;
             }
         }
 
@@ -540,7 +557,7 @@ namespace IdxSistemas.AppRepository.Services
                     DataVencimento = (DateTime)pedido.Data,
                     Desconto = pedido.ValorDesconto,
                     FlagEntrada = pedido.FlagEntrada,
-                    FlagPgto = StatusContaReceber.PAGO,
+                    FlagPgto = StatusContaReceber.PENDENTE,
                     Juros = Math.Round( (double) pedido.ValorAcrescimo, 2),
                     Loja = pedido.Loja,
                     NumeroCI = pedido.Numero,
@@ -563,9 +580,9 @@ namespace IdxSistemas.AppRepository.Services
                     );
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 
@@ -586,10 +603,9 @@ namespace IdxSistemas.AppRepository.Services
 
                 db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                throw ex;
             }
         }
 

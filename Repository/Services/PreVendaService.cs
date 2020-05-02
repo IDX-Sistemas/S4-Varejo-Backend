@@ -27,9 +27,9 @@ namespace IdxSistemas.AppRepository.Services
                 p.Finalizado = Status;
                 return db.SaveChanges();   
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

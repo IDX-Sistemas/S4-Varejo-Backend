@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using IdxSistemas.AppRepository.Services;
 using Microsoft.AspNetCore.Authorization;
+using IdxSistemas.AppServer;
+using Microsoft.AspNetCore.Http;
 
 namespace Projetos.Controllers
 {
@@ -28,18 +30,18 @@ namespace Projetos.Controllers
         public AuthController(DataContext db) => this.db = db;
 
         [HttpGet("GetUserInfo")]
-        public ActionResult GetUserInfo(int id)
+        public ActionResult GetUserInfo(string id)
         {
-             if (@User.FindFirst(ClaimTypes.Sid).Value == null){
-                 return NoContent();
+            if (@User.FindFirst(ClaimTypes.Sid).Value == null){
+                return NoContent();
             }
            
             return Ok(new {
                 NomeCompleto = @User.FindFirst(ClaimTypes.Name).Value,
                 UserId = @User.FindFirst(ClaimTypes.Sid).Value,
-                Email = @User.FindFirst(ClaimTypes.Email).Value,
-                Filial = "01",
-                Role = "ALL"
+                //Email = @User.FindFirst(ClaimTypes.Email).Value,
+                //Filial = "01",
+                Role = @User.FindFirst(ClaimTypes.Role).Value
             });
         }
 
@@ -51,30 +53,21 @@ namespace Projetos.Controllers
         {   
             try
             {
-                var service = new UserService(this.db);
-                var user = service.Authenticate(identity.Username, identity.Password);
-        
-                if (user == null)
+                var userToken = new TokenProvider(this.db).LoginUser(identity.Username, identity.Password);
+                
+
+                if ( string.IsNullOrEmpty(  userToken ))
                     return BadRequest(new { message = "Usuário ou senha inválidos" });
 
-                var claimsIdentity = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name    , user.Nome),
-                    new Claim(ClaimTypes.Sid     , user.Nome),
-                    new Claim(ClaimTypes.Email   , ""),
-                    new Claim(ClaimTypes.GroupSid, "01"),
-                    new Claim(ClaimTypes.Role    , "ALL")
-                }, "Cookies");
 
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-                Request.HttpContext.SignInAsync("Cookies", claimsPrincipal).Wait();
-
-                return Ok();
-
+                HttpContext.Session.SetString("JWToken", userToken);
+              
+                return Ok(userToken);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -84,7 +77,7 @@ namespace Projetos.Controllers
         [AllowAnonymous]
         public IActionResult Logout()
         {
-            HttpContext.SignOutAsync("Cookies").Wait();
+            HttpContext.Session.Clear();
             return NoContent();
         }
 

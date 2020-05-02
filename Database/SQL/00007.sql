@@ -1,0 +1,1 @@
+﻿ALTER TABLE ite_com ADD COLUMN ENT_ANT varchar(1) NOT NULL DEFAULT 'N'

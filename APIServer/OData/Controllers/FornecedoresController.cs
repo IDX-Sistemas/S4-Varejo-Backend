@@ -28,9 +28,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
             {
                 return Ok(service.getProximoCodigo());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ModelState);
             }
         }
     }

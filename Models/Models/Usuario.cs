@@ -16,5 +16,13 @@ namespace IdxSistemas.Models
         [Required]
         [MaxLength(10)]
         public string Senha { get; set; }
+
+
+        [Column("FUNCAO_ID"),MaxLength(15)]
+        public string UsuarioFuncaoId { get; set; }
+
+        [ForeignKey("UsuarioFuncaoId")]
+        public UsuarioFuncao UsuarioFuncao { get; set; }
+
     }
 }

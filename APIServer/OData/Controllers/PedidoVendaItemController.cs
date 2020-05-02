@@ -26,6 +26,7 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 return BadRequest(ModelState);
             }
 
+            
             var preVendaService = new PreVendaService(db, configuration);
 
             db.PedidoVendaItem.Add(t);

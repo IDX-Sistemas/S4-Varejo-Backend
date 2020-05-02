@@ -2,10 +2,12 @@ using System;
 using Microsoft.EntityFrameworkCore;
 
 using IdxSistemas.Models;
+using System.Linq;
+using Repository.Context;
 
 namespace IdxSistemas.AppRepository.Context
 {
-    public class DataContext : DbContext
+    public class DataContext : DbContext, IDbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
@@ -55,48 +57,52 @@ namespace IdxSistemas.AppRepository.Context
         public DbSet<Pergunta> Perguntas { get; set; }
         public DbSet<VendaSecao> VendaSecao { get; set; }
         public DbSet<FechamentoCaixa> FechamentoCaixa { get; set; }
+        public DbSet<Modulo> Modulos { get; set; }
+        public DbSet<Aplicativo> Aplicativos { get; set; }
+        public DbSet<ModuloAplicativo> ModuloAplicativos { get; set; }
+        public DbSet<UsuarioFuncao> UsuarioFuncao { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Loja>().HasKey( e => e.Codigo );
-            
-            builder.Entity<Cliente>().HasKey( e => e.Codigo );
-            builder.Entity<Cliente>( e => e.HasIndex( c => c.Codigo).IsUnique(true) );
-            
-            builder.Entity<Fornecedor>().HasKey( e => e.Codigo );
-            builder.Entity<Fornecedor>( e => e.HasIndex(c => c.Codigo).IsUnique(true) );
+            builder.Entity<Loja>().HasKey(e => e.Codigo);
+
+            builder.Entity<Cliente>().HasKey(e => e.Codigo);
+            builder.Entity<Cliente>(e => e.HasIndex(c => c.Codigo).IsUnique(true));
+
+            builder.Entity<Fornecedor>().HasKey(e => e.Codigo);
+            builder.Entity<Fornecedor>(e => e.HasIndex(c => c.Codigo).IsUnique(true));
 
             builder.Entity<Produto>().HasKey(e => e.Codigo);
-            builder.Entity<Produto>( e => e.HasIndex( c => c.Codigo ).IsUnique(true));
+            builder.Entity<Produto>(e => e.HasIndex(c => c.Codigo).IsUnique(true));
 
-            builder.Entity<ContaBancaria>().HasKey( e => e.Codigo );
+            builder.Entity<ContaBancaria>().HasKey(e => e.Codigo);
 
-            builder.Entity<Vendedor>().HasKey( e => e.Codigo );
+            builder.Entity<Vendedor>().HasKey(e => e.Codigo);
 
-            builder.Entity<DocumentoEntrada>().HasKey( e => new { e.Numero, e.Fornecedor });
+            builder.Entity<DocumentoEntrada>().HasKey(e => new { e.Numero, e.Fornecedor });
             builder.Entity<DocumentoEntrada>()
-                .HasMany<DocumentoEntradaItem>( m => m.DocumentoEntradaItems )
-                .WithOne( e => e.DocumentoEntrada )
+                .HasMany<DocumentoEntradaItem>(m => m.DocumentoEntradaItems)
+                .WithOne(e => e.DocumentoEntrada)
                 .HasForeignKey(e => new { e.DocumentoEntradaNumero, e.Fornecedor });
 
-            builder.Entity<DocumentoEntradaItem>().HasKey( e => new { e.DocumentoEntradaNumero, e.Fornecedor, e.RowId });
-            
-            builder.Entity<PedidoVenda>().HasKey( e => new { e.Numero, e.Loja } );
+            builder.Entity<DocumentoEntradaItem>().HasKey(e => new { e.DocumentoEntradaNumero, e.Fornecedor, e.RowId });
+
+            builder.Entity<PedidoVenda>().HasKey(e => new { e.Numero, e.Loja });
             builder.Entity<PedidoVenda>()
-                .HasMany<PedidoVendaItem>( m => m.PedidoVendaItems )
-                .WithOne( e => e.PedidoVenda )
+                .HasMany<PedidoVendaItem>(m => m.PedidoVendaItems)
+                .WithOne(e => e.PedidoVenda)
                 .HasForeignKey(e => new { e.NumeroVenda, e.Loja });
 
-            builder.Entity<PedidoVendaItem>().HasKey( e => new { e.NumeroVenda, e.Loja, e.RowId });
+            builder.Entity<PedidoVendaItem>().HasKey(e => new { e.NumeroVenda, e.Loja, e.RowId });
 
             builder.Entity<PreVenda>().HasKey(e => e.Numero);
 
             builder.Entity<CondicaoPagamento>().HasKey(e => e.Codigo);
 
             builder.Entity<ContaReceber>().HasKey(e => new { e.NumeroDuplicata, e.Loja });
+
+            builder.Entity<FechamentoCaixa>(e => e.HasIndex(c => c.Data).IsUnique(false));
+
         }
-
     }
-
-    
 }

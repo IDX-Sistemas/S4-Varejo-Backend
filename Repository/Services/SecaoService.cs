@@ -1,7 +1,9 @@
 using System;
+using System.Data;
 using System.Data.SqlClient;
 using IdxSistemas.AppRepository.Context;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace IdxSistemas.AppRepository.Services
 {
@@ -25,23 +27,23 @@ namespace IdxSistemas.AppRepository.Services
         {
             try
             {
-                using (var conn = new SqlConnection(connString))
+                using (var conn = new MySqlConnection(connString))
                 {
-                    if (conn.State == System.Data.ConnectionState.Closed)
+                    if (conn.State == ConnectionState.Closed)
                         conn.Open();
 
                     var sql = "SELECT sql_rowid FROM cad_sec WHERE COD_SEC = @COD_SEC AND sql_deleted <> 'T' ";
-                    var cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add( new SqlParameter("@COD_SEC", Codigo));
+                    var cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.Add( new MySqlParameter("@COD_SEC", Codigo));
 
                     var rs = cmd.ExecuteReader();
 
                     return rs.HasRows ;   
                 }
             }
-            catch (System.Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
         

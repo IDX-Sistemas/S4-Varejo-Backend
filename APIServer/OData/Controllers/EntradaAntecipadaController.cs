@@ -29,6 +29,11 @@ namespace IdxSistemas.AppServer.OData.Controllers
         [HttpPost]
         public new IActionResult Post([FromBody] EntradaAntecipada t)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
             var p = t.Produto.Split(' ');
 
             var codigoMarca = p[0].ToString();
@@ -62,9 +67,10 @@ namespace IdxSistemas.AppServer.OData.Controllers
                 db.SaveChanges();
                 entradaAntecipadaService.EntradaAntecipada(t);
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                throw;
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return BadRequest(ModelState);
             }
 
             return Created(t);

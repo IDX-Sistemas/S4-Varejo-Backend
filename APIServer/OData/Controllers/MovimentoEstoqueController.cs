@@ -14,6 +14,7 @@ namespace IdxSistemas.AppServer.OData.Controllers
     {
         private readonly DataContext db;
         private readonly SaldoEstoqueService service;
+        private readonly ProdutoService produtoService;
         private readonly IConfiguration configuration;
 
         private const string SALDO_INICIAL = "01";
@@ -26,6 +27,7 @@ namespace IdxSistemas.AppServer.OData.Controllers
             this.db = db;
             this.configuration = configuration;
             this.service = new SaldoEstoqueService(db, configuration);
+            this.produtoService = new ProdutoService(db, configuration);
         }
 
         [HttpGet, EnableQuery]
@@ -45,14 +47,26 @@ namespace IdxSistemas.AppServer.OData.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] MovimentoEstoque t)
         {
-          
-            if (t.CodigoTransferencia == TRANSFERENCIA && t.LocalEstoqueEntrada == t.LocalEstoqueSaida)
-            {
-                ModelState.AddModelError("LocalEstoque", "Local de Estoque nao pode ser igual na transferencia."); 
-            }
-
             if (!ModelState.IsValid)
             {
+                return BadRequest(ModelState);
+            }
+
+            if (t.CodigoTransferencia == TRANSFERENCIA && t.LocalEstoqueEntrada == t.LocalEstoqueSaida)
+            {
+                ModelState.AddModelError("LocalEstoque", "Local de Estoque nao pode ser igual na transferencia.");
+                return BadRequest(ModelState);
+            }
+
+            if (!produtoService.existeCodigo(t.CodigoItem))
+            {
+                ModelState.AddModelError(string.Empty, "Produto nao cadastrato.");
+                return BadRequest(ModelState);
+            }
+
+            if (t.QuantidadeAtual <= 0 )
+            {
+                ModelState.AddModelError(string.Empty, "Informe Quantidade maior que zero.");
                 return BadRequest(ModelState);
             }
 
@@ -104,7 +118,7 @@ namespace IdxSistemas.AppServer.OData.Controllers
 
         private bool EntityExists(long key)
         {
-            return db.MovimentoEstoque.Count(e => e.RowId == key) > 0;
+            return db.MovimentoEstoque.Count(e => e.RowId == key && e.RowDeleted != "T") > 0;
         }
 
 

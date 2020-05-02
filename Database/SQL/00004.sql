@@ -1,0 +1,1 @@
+﻿ALTER TABLE cad_com ADD COLUMN STA_COM varchar(1) NOT NULL;

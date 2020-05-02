@@ -51,10 +51,10 @@ namespace IdxSistemas.AppRepository.Services
 
                 return db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
 
@@ -81,10 +81,10 @@ namespace IdxSistemas.AppRepository.Services
 
                 return db.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
 

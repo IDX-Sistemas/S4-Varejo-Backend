@@ -24,51 +24,78 @@ using Newtonsoft.Json.Serialization;
 
 using IdxSistemas.AppServer.OData.Edm;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdxSistemas.AppServer
 {
     public class Startup
     {
-         public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<KestrelServerOptions>(
                 Configuration.GetSection("Kestrel")
             );
 
-            services.AddDbContext<DataContext>(
-                options => 
-                    options.UseSqlServer( 
-                        Configuration.GetConnectionString("sage_db"), 
-                        b => b.MigrationsAssembly("APIServer") 
-                    ) 
-            );
-            
-            services.AddAuthentication(x =>
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.Name = "IdxTec";
+            });
+
+            //services.AddDbContext<DataContext>(
+            //    options => 
+            //        options.UseSqlServer( 
+            //            Configuration.GetConnectionString("sage_db"), 
+            //            b => b.MigrationsAssembly("APIServer") 
+            //        ) 
+            //);
+
+            services.AddDbContextPool<DataContext>(options => {
+                options.UseMySql(Configuration.GetConnectionString("sage_db"),
+                        b => b.MigrationsAssembly("APIServer"));
+            });
+
+            var SecretKey = Encoding.ASCII.GetBytes
+                    ("IdxTecKey-2374-OFFKDI940NG7:56753253-tyuw-5769-0921-kfirox29zoxv");
+
+
+            services.AddAuthentication(auth =>
             {
-                x.DefaultAuthenticateScheme = "Cookies";
-                x.DefaultChallengeScheme = "Cookies";
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddCookie("Cookies", options => {
-                options.Cookie.Name = "SIAGRO_SSO";
-                options.Cookie.SameSite = SameSiteMode.None;
-                options.Events = new CookieAuthenticationEvents
+            .AddJwtBearer(token =>
+            {
+                token.RequireHttpsMetadata = false;
+                token.SaveToken = true;
+                token.TokenValidationParameters = new TokenValidationParameters
                 {
-                    OnRedirectToLogin = redirectContext => 
-                    {
-                        redirectContext.HttpContext.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-                    }
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(SecretKey),
+                    ValidateIssuer = true,
+                    //Usually, this is your application base URL
+                    ValidIssuer = "http://localhost:5000/",
+                    ValidateAudience = true,
+                    //Here, we are creating and using JWT within the same application.
+                    //In this case, base URL is fine.
+                    //If the JWT is created using a web service, then this would be the consumer URL.
+                    ValidAudience = "http://localhost:5000/",
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
-            
+
             services.AddCors();
             services.AddOData();
 
@@ -79,23 +106,18 @@ namespace IdxSistemas.AppServer
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
-               
+
                 config.Filters.Add(new AuthorizeFilter(policy));
-                
+
 
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());            
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ALL", policy => policy.RequireClaim(ClaimTypes.Role, "ALL"));
-            });
-                  
+            services.AddAuthorization();
         }
 
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -115,21 +137,34 @@ namespace IdxSistemas.AppServer
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
+            app.UseSession();
+
             app.Use(async (context, next) =>
             {
                 context.Request.Headers["CookieBackup"] = context.Request.Headers["Cookie"];
                 context.Request.Headers.Remove("Cookie");
+
                 await next();
-            });   // Exception when handle odata batch request when is has cookie #1620
+            });
 
             app.UseODataBatching();
 
             app.Use(async (context, next) =>
             {
+                var JWToken = context.Session.GetString("JWToken");
+                if (!string.IsNullOrEmpty(JWToken))
+                {
+                    if (!context.Request.Headers.ContainsKey("Authorization"))
+                    {
+                        context.Request.Headers.Add("Authorization", "Bearer " + JWToken);
+                    }
+                }
+
                 context.Request.Headers["Cookie"] = context.Request.Headers["CookieBackup"];
                 context.Request.Headers.Remove("CookieBackup");
+                
                 await next();
-            });   // Exception when handle odata batch request when is has cookie #1620
+            });
 
             app.UseAuthentication();
             app.UseCookiePolicy();
@@ -138,7 +173,6 @@ namespace IdxSistemas.AppServer
                 b=>{
                     b.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
                     b.MapODataServiceRoute("default","service.svc", DefaultEdmModel.GetEdmModel(), new DefaultODataBatchHandler());
-                    //b.MapODataServiceRoute("pedidoVenda","pedido_venda.svc", PedidoVendaEdmModel.GetEdmModel(), new DefaultODataBatchHandler());
                     b.EnableDependencyInjection();    
                 }
             );
